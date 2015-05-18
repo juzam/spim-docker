@@ -1,0 +1,25 @@
+Index: spim/spim.c
+===================================================================
+--- spim/spim.c	(revision 658)
++++ spim/spim.c	(working copy)
+@@ -336,7 +336,7 @@
+        }
+      else
+        {
+-         bool continuable;
++         bool continuable = true;
+          console_to_program ();
+          initialize_run_stack (program_argc, program_argv);
+          if (!setjmp (spim_top_level_env))
+@@ -349,7 +349,10 @@
+                  write_output (message_out, "\n");
+                  free (undefs);
+                }
+-             run_program (find_symbol_address (DEFAULT_RUN_LOCATION), DEFAULT_RUN_STEPS, false, false, &continuable);
++               bool breakpoint_encountered = false;
++               PC = find_symbol_address (DEFAULT_RUN_LOCATION);
++               while (!breakpoint_encountered && continuable)
++                breakpoint_encountered = run_program (PC, DEFAULT_RUN_STEPS, false, false, &continuable);
+            }
+          console_to_spim ();
+        }
